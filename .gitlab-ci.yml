@@ -1,0 +1,47 @@
+# 8cee Vintage — GitLab CI
+# Windows builds run on GitLab's hosted Windows runners.
+# macOS hosted runners need GitLab Premium/Ultimate (or your own Mac runner), so that job is manual.
+
+stages:
+  - build
+
+variables:
+  GIT_DEPTH: "1"
+
+windows:
+  stage: build
+  tags:
+    - saas-windows-medium-amd64
+  script:
+    - cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+    - cmake --build build --config Release --parallel 4
+    - New-Item -ItemType Directory -Force -Path dist\VST3, dist\Standalone | Out-Null
+    - foreach ($p in "FET8","Bus8","Reel8") { Copy-Item -Recurse "build\${p}_artefacts\Release\VST3\*.vst3" dist\VST3\ ; Copy-Item "build\${p}_artefacts\Release\Standalone\*.exe" dist\Standalone\ }
+    - curl.exe -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip
+    - Expand-Archive pv.zip -DestinationPath pv -Force
+    - Get-ChildItem dist\VST3\*.vst3 | ForEach-Object { .\pv\pluginval.exe --strictness-level 5 --validate-in-process --skip-gui-tests --timeout-ms 600000 $_.FullName; if ($LASTEXITCODE -ne 0) { exit 1 } }
+  artifacts:
+    name: "8cee-Vintage-Windows"
+    paths:
+      - dist/
+    expire_in: 90 days
+
+macos:
+  stage: build
+  when: manual
+  allow_failure: true
+  tags:
+    - saas-macos-medium-m1
+  image: macos-14-xcode-15
+  script:
+    - brew install cmake || true
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+    - cmake --build build --config Release --parallel 4
+    - mkdir -p dist/VST3 dist/AU dist/Standalone
+    - for p in FET8 Bus8 Reel8; do cp -R build/${p}_artefacts/Release/VST3/*.vst3 dist/VST3/; cp -R build/${p}_artefacts/Release/AU/*.component dist/AU/; cp -R build/${p}_artefacts/Release/Standalone/*.app dist/Standalone/; done
+    - find dist -maxdepth 2 \( -name "*.vst3" -o -name "*.component" -o -name "*.app" \) -exec codesign --force --deep -s - {} \;
+  artifacts:
+    name: "8cee-Vintage-macOS"
+    paths:
+      - dist/
+    expire_in: 90 days
