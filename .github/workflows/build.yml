@@ -29,7 +29,12 @@ jobs:
 
       - name: Configure
         shell: bash
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release ${{ matrix.cmake_args }}
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            # static MSVC runtime: no VC++ Redistributable needed, and JUCE's juceaide helper runs on any runner
+            export CMAKE_TOOLCHAIN_FILE="$(pwd -W)/cmake/msvc-static-runtime.cmake"
+          fi
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release ${{ matrix.cmake_args }}
 
       - name: Build
         shell: bash

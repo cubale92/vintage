@@ -14,7 +14,7 @@ All three: 2× oversampling where the saturation lives (FET-8, Reel-8), phase-co
 
 **GitLab** (gitlab.com/8cee-group/vintage): every push runs `.gitlab-ci.yml`. The **windows** job builds the VST3s and standalone apps, checks them with **pluginval**, and the result is under **Build → Pipelines → (run) → download artifacts**. The **macos** job is manual because GitLab's hosted Mac runners need a paid plan (or your own Mac registered as a runner).
 
-**GitHub**: `.github/workflows/build.yml` does the same for Windows and macOS (Apple Silicon + Intel) under **Actions → Artifacts**.
+**GitHub** (github.com/cubale92/vstvintage): `.github/workflows/build.yml` does the same for Windows and macOS (Apple Silicon + Intel) under **Actions → Artifacts**.
 
 ## Build it yourself
 
