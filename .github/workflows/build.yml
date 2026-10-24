@@ -20,7 +20,7 @@ jobs:
             pluginval_bin: ./pluginval.exe
           - name: macOS
             os: macos-14
-            cmake_args: "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+            cmake_args: '"-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"'
             pluginval_zip: pluginval_macOS.zip
             pluginval_bin: ./pluginval.app/Contents/MacOS/pluginval
 
