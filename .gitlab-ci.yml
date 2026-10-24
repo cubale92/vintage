@@ -13,6 +13,7 @@ windows:
   tags:
     - saas-windows-medium-amd64
   script:
+    - $env:CMAKE_TOOLCHAIN_FILE = "$((Get-Location).Path -replace '\\','/')/cmake/msvc-static-runtime.cmake"
     - cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
     - cmake --build build --config Release --parallel 4
     - New-Item -ItemType Directory -Force -Path dist\VST3, dist\Standalone | Out-Null
