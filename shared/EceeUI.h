@@ -697,10 +697,16 @@ private:
     void showMenu()
     {
         juce::PopupMenu menu;
-        menu.addSectionHeader ("FACTORY PRESETS");
         const auto& list = proc.getPresets();
+        juce::String lastCategory;
         for (int i = 0; i < (int) list.size(); ++i)
-            menu.addItem (i + 1, list[(size_t) i].name, true, i == proc.getCurrentProgram());
+        {
+            const auto& pr = list[(size_t) i];
+            if (pr.category != lastCategory && pr.category.isNotEmpty())
+                menu.addSectionHeader (pr.category.toUpperCase());
+            lastCategory = pr.category;
+            menu.addItem (i + 1, pr.name, true, i == proc.getCurrentProgram());
+        }
 
         if (proc.isPresetModified())
         {

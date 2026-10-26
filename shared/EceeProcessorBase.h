@@ -11,6 +11,7 @@ struct Preset
 {
     juce::String name;
     std::vector<std::pair<juce::String, float>> values;
+    juce::String category {};   // groups presets in the menu
 };
 
 class ProcessorBase : public juce::AudioProcessor

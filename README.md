@@ -12,22 +12,15 @@ All three: 2× oversampling where the saturation lives (FET-8, Reel-8), phase-co
 
 ## Presets
 
-Each plug-in has 12 factory presets. Click the amber display at the top of the faceplate for the list, or use its arrows or the mouse wheel to step through them. A `*` means you've tweaked it since loading; the menu then offers "Revert". Your DAW also sees them as programs. Your own settings are saved with the project.
+Each plug-in ships with factory presets grouped by style. Click the amber display at the top of the faceplate for the menu, or step through with its arrows or the mouse wheel. A `*` means you've tweaked it since loading; the menu then offers "Revert". Your DAW sees them as programs too, and your own settings are saved with the project.
 
-| FET-8 | Bus-8 | Reel-8 |
-|---|---|---|
-| Init | Init | Init |
-| Drum Bus Smash | Mix Bus Glue | Mix Bus Glue |
-| Parallel NY Drums | Drum Bus Punch | Warm 15 IPS |
-| Kick Punch | Boom Bap Pump | Drum Tape Smash |
-| Snare Crack | Parallel Drum Crush | Dusty Sampler |
-| Dusty Breaks | Breakbeat Tight | Cassette Deck |
-| Room Mic Crush | Sample Chop Glue | Wobbly VHS |
-| 808 Control | Loop Leveler | Bass Thickener |
-| Vocal Leveler | Vocal Bus | Keys & Rhodes Warmth |
-| Rap Vocal Upfront | Master Gentle | Vocal Tape Sheen |
-| Sample Flattener | Master Loud | Parallel Saturation |
-| Peak Catcher | Clean Glue (No Colour) | Clean Hi-Fi Print |
+| Style | FET-8 | Bus-8 | Reel-8 |
+|---|---|---|---|
+| **90s NY Boom Bap** | Drum Bus Smash, Parallel NY Drums, Dusty Breaks, Room Mic Crush, Snare Crack, Kick Punch, Sample Flattener | Boom Bap Pump, Drum Bus Punch, Breakbeat Tight, Parallel Drum Crush, Sample Chop Glue, Loop Leveler | Dusty Sampler, Drum Tape Smash, Cassette Deck, Bass Thickener, Parallel Saturation |
+| **New Jack Swing** | New Jack Snare, New Jack Drum Machine, New Jack Synth Bass | New Jack Swing Bus, New Jack Drum Snap | New Jack Shine, New Jack Drum Punch |
+| **R&B** | R&B Vocal Smooth, R&B Background Vox, R&B Bass Smooth | R&B Mix Polish, R&B Vocal Stack Glue, R&B Keys & Pads | R&B Silk 30 IPS, R&B Warm Keys, Keys & Rhodes Warmth |
+| **Conscious** | Jazz Drums, Spoken Word Upfront, Upright Bass | Jazz Loop Glue, Conscious Mix Bus | Jazz Sample Warmth, Spoken Word Tape, Horns & Upright Bass |
+| **Tools / Mix** | Vocal Leveler, Rap Vocal Upfront, 808 Control, Peak Catcher | Mix Bus Glue, Vocal Bus, Master Gentle, Master Loud, Clean Glue (No Colour) | Mix Bus Glue, Warm 15 IPS, Vocal Tape Sheen, Wobbly VHS, Clean Hi-Fi Print |
 
 ## Download a build (easiest)
 
