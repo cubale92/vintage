@@ -42,7 +42,7 @@ Bus8Processor::Bus8Processor()
         { "Drum Bus Punch",       { { "threshold", -18 }, { "ratio", 1 }, { "attack", 4 }, { "release", 0 }, { "makeup", 4 },  { "schpf", 2 } } },
         { "Boom Bap Pump",        { { "threshold", -22 }, { "ratio", 2 }, { "attack", 3 }, { "release", 0 }, { "makeup", 7 } } },
         { "Parallel Drum Crush",  { { "threshold", -28 }, { "ratio", 2 }, { "attack", 0 }, { "release", 0 }, { "makeup", 12 }, { "mix", 40 } } },
-        { "Trap Drums Tight",     { { "threshold", -16 }, { "ratio", 1 }, { "attack", 2 }, { "release", 1 }, { "makeup", 4 },  { "schpf", 2 } } },
+        { "Breakbeat Tight",      { { "threshold", -16 }, { "ratio", 1 }, { "attack", 2 }, { "release", 1 }, { "makeup", 4 },  { "schpf", 2 } } },
         { "Sample Chop Glue",     { { "threshold", -14 }, { "ratio", 1 }, { "attack", 3 }, { "release", 1 }, { "makeup", 3 },  { "schpf", 3 } } },
         { "Loop Leveler",         { { "threshold", -16 }, { "ratio", 1 }, { "attack", 2 }, { "release", 2 }, { "makeup", 4 } } },
         { "Vocal Bus",            { { "threshold", -14 }, { "ratio", 0 }, { "attack", 4 }, { "release", 1 }, { "makeup", 2 },  { "schpf", 3 } } },

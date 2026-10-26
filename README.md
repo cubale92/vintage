@@ -21,7 +21,7 @@ Each plug-in has 12 factory presets. Click the amber display at the top of the f
 | Parallel NY Drums | Drum Bus Punch | Warm 15 IPS |
 | Kick Punch | Boom Bap Pump | Drum Tape Smash |
 | Snare Crack | Parallel Drum Crush | Dusty Sampler |
-| Dusty Breaks | Trap Drums Tight | Cassette Deck |
+| Dusty Breaks | Breakbeat Tight | Cassette Deck |
 | Room Mic Crush | Sample Chop Glue | Wobbly VHS |
 | 808 Control | Loop Leveler | Bass Thickener |
 | Vocal Leveler | Vocal Bus | Keys & Rhodes Warmth |
