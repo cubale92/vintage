@@ -37,7 +37,8 @@ Fet8Panel::Fet8Panel (Fet8Processor& p)
                          vu.setReference (m == 1 ? -14.0f : -18.0f);
                          vu.setCaption (m == 1 ? "OUTPUT +8" : "OUTPUT +4");
                      }
-                 }, nullptr)
+                 }, nullptr),
+      presetBar (p)
 {
     attack.setReversed();
     release.setReversed();
@@ -56,6 +57,7 @@ Fet8Panel::Fet8Panel (Fet8Processor& p)
     addAndMakeVisible (meterButtons);
     addAndMakeVisible (link);
     addAndMakeVisible (vu);
+    addAndMakeVisible (presetBar);
     meterMode.sendInitialUpdate();
 }
 
@@ -110,4 +112,5 @@ void Fet8Panel::resized()
     mixKnob.setBounds (700, 226, 92, 118);
     hpf.setBounds (790, 226, 100, 118);
     link.setBounds (892, 240, 64, 90);
+    presetBar.setBounds (560, 8, 270, 28);
 }

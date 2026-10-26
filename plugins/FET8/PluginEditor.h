@@ -18,6 +18,7 @@ private:
     ecee::ui::BatSwitch link;
     ecee::ui::VUMeter vu;
     juce::ParameterAttachment meterMode;
+    ecee::ui::PresetBar presetBar;
 };
 
 class Fet8Editor : public ecee::ui::ScaledEditor

@@ -10,6 +10,25 @@ Three analog-style mixing plug-ins by **8cee**, built with JUCE. VST3 on Windows
 
 All three: 2× oversampling where the saturation lives (FET-8, Reel-8), phase-coherent dry/wet, VU meters with real ballistics, resizable vector UI (50–200 %), double-click any knob to reset.
 
+## Presets
+
+Each plug-in has 12 factory presets. Click the amber display at the top of the faceplate for the list, or use its arrows or the mouse wheel to step through them. A `*` means you've tweaked it since loading; the menu then offers "Revert". Your DAW also sees them as programs. Your own settings are saved with the project.
+
+| FET-8 | Bus-8 | Reel-8 |
+|---|---|---|
+| Init | Init | Init |
+| Drum Bus Smash | Mix Bus Glue | Mix Bus Glue |
+| Parallel NY Drums | Drum Bus Punch | Warm 15 IPS |
+| Kick Punch | Boom Bap Pump | Drum Tape Smash |
+| Snare Crack | Parallel Drum Crush | Dusty Sampler |
+| Dusty Breaks | Trap Drums Tight | Cassette Deck |
+| Room Mic Crush | Sample Chop Glue | Wobbly VHS |
+| 808 Control | Loop Leveler | Bass Thickener |
+| Vocal Leveler | Vocal Bus | Keys & Rhodes Warmth |
+| Rap Vocal Upfront | Master Gentle | Vocal Tape Sheen |
+| Sample Flattener | Master Loud | Parallel Saturation |
+| Peak Catcher | Clean Glue (No Colour) | Clean Hi-Fi Print |
+
 ## Download a build (easiest)
 
 **GitLab** (gitlab.com/8cee-group/vintage): every push runs `.gitlab-ci.yml`. The **windows** job builds the VST3s and standalone apps, checks them with **pluginval**, and the result is under **Build → Pipelines → (run) → download artifacts**. The **macos** job is manual because GitLab's hosted Mac runners need a paid plan (or your own Mac registered as a runner).

@@ -18,7 +18,8 @@ Bus8Panel::Bus8Panel (Bus8Processor& p)
       hpf       (p.state, "schpf",     "SC HPF",    Bus8Processor::hpfNames(),     "chicken"),
       mixKnob   (p.state, "mix",       "MIX",       { "DRY", "", "", "", "WET" }),
       colour    (*p.state.getParameter ("color"), { "CLEAN", "COLOUR" }, "ANALOG", kText),
-      vu ([&p] { return p.meterGr.load(); }, VUMeter::Mode::gainReduction, "COMP")
+      vu ([&p] { return p.meterGr.load(); }, VUMeter::Mode::gainReduction, "COMP"),
+      presetBar (p)
 {
     for (auto* k : { &threshold, &ratio, &attack, &release, &makeup, &hpf, &mixKnob })
     {
@@ -31,6 +32,7 @@ Bus8Panel::Bus8Panel (Bus8Processor& p)
     mixKnob.setKnobScale (0.85f);
     addAndMakeVisible (colour);
     addAndMakeVisible (vu);
+    addAndMakeVisible (presetBar);
 }
 
 void Bus8Panel::paint (juce::Graphics& g)
@@ -72,4 +74,5 @@ void Bus8Panel::resized()
     hpf.setBounds     (478, 212, 118, 108);
     mixKnob.setBounds (604, 212, 118, 108);
     colour.setBounds  (770, 236, 110, 80);
+    presetBar.setBounds (560, 17, 270, 28);
 }

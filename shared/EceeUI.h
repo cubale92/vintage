@@ -3,6 +3,7 @@
 // Everything is drawn in code (no bitmaps), so the UI stays sharp at any size.
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "EceeProcessorBase.h"
 #include <functional>
 #include <cmath>
 
@@ -141,7 +142,14 @@ public:
         setColour (juce::BubbleComponent::backgroundColourId, juce::Colour (0xf0151515));
         setColour (juce::BubbleComponent::outlineColourId, juce::Colour (0xff6b5d3f));
         setColour (juce::TooltipWindow::textColourId, juce::Colour (0xfff1e4c3));
+        setColour (juce::PopupMenu::backgroundColourId, juce::Colour (0xff17171a));
+        setColour (juce::PopupMenu::textColourId, juce::Colour (0xffe9e2cf));
+        setColour (juce::PopupMenu::headerTextColourId, juce::Colour (0xffd7a84a));
+        setColour (juce::PopupMenu::highlightedBackgroundColourId, juce::Colour (0xff6b5d3f));
+        setColour (juce::PopupMenu::highlightedTextColourId, juce::Colour (0xfffff4d6));
     }
+
+    juce::Font getPopupMenuFont() override { return juce::Font (font (14.0f, true)); }
 
     juce::Font getSliderPopupFont (juce::Slider&) override { return juce::Font (font (13.0f, true)); }
     int getSliderPopupPlacement (juce::Slider&) override   { return juce::BubbleComponent::above; }
@@ -614,6 +622,121 @@ private:
     juce::String text;
     float needle = -24.0f, referenceDb = -18.0f;
     bool lit = true;
+};
+
+//==============================================================================
+/** Amber preset display: < name > . Click the name for the full list. */
+class PresetBar : public juce::Component, private juce::Timer
+{
+public:
+    explicit PresetBar (ecee::ProcessorBase& p) : proc (p)
+    {
+        setMouseCursor (juce::MouseCursor::PointingHandCursor);
+        startTimerHz (10);
+        timerCallback();
+    }
+
+    void paint (juce::Graphics& g) override
+    {
+        auto b = getLocalBounds().toFloat();
+        drawRecess (g, b.reduced (2.0f), 4.0f, juce::Colour (0xff0f0d0a));
+
+        const juce::Colour amber (0xffffb547);
+        auto arrows = b.reduced (2.0f);
+        auto left = arrows.removeFromLeft (arrowW), right = arrows.removeFromRight (arrowW);
+        for (auto [r, dir] : { std::pair { left, -1.0f }, std::pair { right, 1.0f } })
+        {
+            juce::Path tri;
+            const auto c = r.getCentre();
+            tri.addTriangle (c.x - 3.5f * dir, c.y - 5.0f, c.x - 3.5f * dir, c.y + 5.0f, c.x + 4.0f * dir, c.y);
+            g.setColour (amber.withAlpha (hoverZone == (dir < 0 ? 1 : 3) ? 1.0f : 0.6f));
+            g.fillPath (tri);
+        }
+
+        g.setColour (juce::Colours::white.withAlpha (0.06f));
+        g.fillRect (left.getRight(), b.getY() + 6.0f, 1.0f, b.getHeight() - 12.0f);
+        g.fillRect (right.getX() - 1.0f, b.getY() + 6.0f, 1.0f, b.getHeight() - 12.0f);
+
+        // glowing LCD-style text
+        const auto text = (number > 0 ? juce::String (number).paddedLeft ('0', 2) + "  " : juce::String()) + name + (modified ? " *" : "");
+        g.setFont (font (13.5f, true, 0.06f));
+        g.setColour (amber.withAlpha (0.25f));
+        g.drawText (text, arrows.translated (0.0f, 0.5f).expanded (1.0f, 0.0f), juce::Justification::centred, true);
+        g.setColour (hoverZone == 2 ? amber.brighter (0.25f) : amber);
+        g.drawText (text, arrows, juce::Justification::centred, true);
+    }
+
+    void mouseMove (const juce::MouseEvent& e) override  { setHover (zoneAt (e.position.x)); }
+    void mouseExit (const juce::MouseEvent&) override     { setHover (0); }
+
+    void mouseDown (const juce::MouseEvent& e) override
+    {
+        const int n = (int) proc.getPresets().size();
+        if (n == 0) return;
+        const int current = proc.getCurrentProgram();
+        const int zone = zoneAt (e.position.x);
+
+        if (zone == 1)      proc.applyPreset ((current + n - 1) % n);
+        else if (zone == 3) proc.applyPreset ((current + 1) % n);
+        else                showMenu();
+        timerCallback();
+    }
+
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& w) override
+    {
+        const int n = (int) proc.getPresets().size();
+        if (n == 0 || std::abs (w.deltaY) < 0.01f) return;
+        proc.applyPreset ((proc.getCurrentProgram() + (w.deltaY < 0 ? 1 : n - 1)) % n);
+        timerCallback();
+    }
+
+private:
+    int zoneAt (float x) const { return x < arrowW + 2.0f ? 1 : (x > (float) getWidth() - arrowW - 2.0f ? 3 : 2); }
+    void setHover (int z) { if (z != hoverZone) { hoverZone = z; repaint(); } }
+
+    void showMenu()
+    {
+        juce::PopupMenu menu;
+        menu.addSectionHeader ("FACTORY PRESETS");
+        const auto& list = proc.getPresets();
+        for (int i = 0; i < (int) list.size(); ++i)
+            menu.addItem (i + 1, list[(size_t) i].name, true, i == proc.getCurrentProgram());
+
+        if (proc.isPresetModified())
+        {
+            menu.addSeparator();
+            menu.addItem (1000, "Revert to \"" + proc.getProgramName (proc.getCurrentProgram()) + "\"");
+        }
+
+        juce::Component::SafePointer<PresetBar> safe (this);
+        menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this).withMinimumWidth (getWidth()),
+                            [safe] (int result)
+                            {
+                                if (safe == nullptr || result == 0) return;
+                                auto& p = safe->proc;
+                                p.applyPreset (result == 1000 ? p.getCurrentProgram() : result - 1);
+                                safe->timerCallback();
+                            });
+    }
+
+    void timerCallback() override
+    {
+        const int idx = proc.getCurrentProgram();
+        const auto newName = proc.getProgramName (idx).toUpperCase();
+        const bool newModified = proc.isPresetModified();
+        const int newNumber = proc.getPresets().empty() ? 0 : idx + 1;
+        if (newName != name || newModified != modified || newNumber != number)
+        {
+            name = newName; modified = newModified; number = newNumber;
+            repaint();
+        }
+    }
+
+    ecee::ProcessorBase& proc;
+    juce::String name;
+    bool modified = false;
+    int number = 0, hoverZone = 0;
+    static constexpr float arrowW = 24.0f;
 };
 
 //==============================================================================

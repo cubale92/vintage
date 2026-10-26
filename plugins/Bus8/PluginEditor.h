@@ -15,6 +15,7 @@ private:
     ecee::ui::Knob threshold, ratio, attack, release, makeup, hpf, mixKnob;
     ecee::ui::BatSwitch colour;
     ecee::ui::VUMeter vu;
+    ecee::ui::PresetBar presetBar;
 };
 
 class Bus8Editor : public ecee::ui::ScaledEditor

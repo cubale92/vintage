@@ -110,8 +110,10 @@ Reel8Panel::Reel8Panel (Reel8Processor& p)
       wow     (p.state, "wow",    "WOW / FLUT",  { "0", "", "", "", "100" }, "chrome"),
       hiss    (p.state, "hiss",   "HISS",        { "OFF", "", "", "", "MAX" }, "chrome"),
       mixKnob (p.state, "mix",    "MIX",         { "DRY", "", "", "", "WET" }, "chrome"),
-      output  (p.state, "output", "OUTPUT",      { "-18", "-12", "-6", "0", "+6", "+12" }, "chrome")
+      output  (p.state, "output", "OUTPUT",      { "-18", "-12", "-6", "0", "+6", "+12" }, "chrome"),
+      presetBar (p)
 {
+    addAndMakeVisible (presetBar);
     addAndMakeVisible (leftReel);
     addAndMakeVisible (rightReel);
     addAndMakeVisible (vuL);
@@ -196,4 +198,5 @@ void Reel8Panel::resized()
     hiss.setBounds    (560, 306, 120, 150);
     mixKnob.setBounds (680, 306, 120, 150);
     output.setBounds  (800, 302, 140, 160);
+    presetBar.setBounds (596, 16, 260, 28);
 }

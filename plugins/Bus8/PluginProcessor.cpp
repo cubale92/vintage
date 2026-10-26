@@ -34,6 +34,22 @@ Bus8Processor::Bus8Processor()
     pHpf     = state.getRawParameterValue ("schpf");
     pMix     = state.getRawParameterValue ("mix");
     pColor   = state.getRawParameterValue ("color");
+
+    // ratio: 0=2 1=4 2=10 | attack: 0=.1 1=.3 2=1 3=3 4=10 5=30 ms | release: 0=.1 1=.3 2=.6 3=1.2 s 4=AUTO | schpf: 0=off 1=60 2=90 3=150 4=250 Hz
+    setPresets ({
+        { "Init", {} },
+        { "Mix Bus Glue",         { { "threshold", -12 }, { "ratio", 0 }, { "attack", 5 }, { "release", 4 }, { "makeup", 2 },  { "schpf", 1 } } },
+        { "Drum Bus Punch",       { { "threshold", -18 }, { "ratio", 1 }, { "attack", 4 }, { "release", 0 }, { "makeup", 4 },  { "schpf", 2 } } },
+        { "Boom Bap Pump",        { { "threshold", -22 }, { "ratio", 2 }, { "attack", 3 }, { "release", 0 }, { "makeup", 7 } } },
+        { "Parallel Drum Crush",  { { "threshold", -28 }, { "ratio", 2 }, { "attack", 0 }, { "release", 0 }, { "makeup", 12 }, { "mix", 40 } } },
+        { "Trap Drums Tight",     { { "threshold", -16 }, { "ratio", 1 }, { "attack", 2 }, { "release", 1 }, { "makeup", 4 },  { "schpf", 2 } } },
+        { "Sample Chop Glue",     { { "threshold", -14 }, { "ratio", 1 }, { "attack", 3 }, { "release", 1 }, { "makeup", 3 },  { "schpf", 3 } } },
+        { "Loop Leveler",         { { "threshold", -16 }, { "ratio", 1 }, { "attack", 2 }, { "release", 2 }, { "makeup", 4 } } },
+        { "Vocal Bus",            { { "threshold", -14 }, { "ratio", 0 }, { "attack", 4 }, { "release", 1 }, { "makeup", 2 },  { "schpf", 3 } } },
+        { "Master Gentle",        { { "threshold", -8 },  { "ratio", 0 }, { "attack", 5 }, { "release", 4 }, { "makeup", 1 },  { "schpf", 1 } } },
+        { "Master Loud",          { { "threshold", -16 }, { "ratio", 1 }, { "attack", 4 }, { "release", 4 }, { "makeup", 5 },  { "schpf", 2 } } },
+        { "Clean Glue (No Colour)", { { "threshold", -12 }, { "ratio", 0 }, { "attack", 5 }, { "release", 4 }, { "makeup", 2 }, { "color", 0 } } },
+    });
 }
 
 void Bus8Processor::prepareToPlay (double sampleRate, int)

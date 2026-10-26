@@ -2,6 +2,7 @@
 // Usage: <tool> out.png
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "EceeProcessorBase.h"
 #include <cmath>
 #include <iostream>
 
@@ -114,6 +115,50 @@ int main (int argc, char** argv)
         setParam (*p, "input", 12.0f); report ("input +12 (auto gain)");
         setParam (*p, "speed", 0.0f); setParam (*p, "formula", 0.0f); report ("7.5 ips ferric, input +12");
         setParam (*p, "input", 0.0f); setParam (*p, "speed", 1.0f); setParam (*p, "formula", 1.0f);
+    }
+
+    // presets: every parameter name must exist, and each preset must produce sane audio
+    if (auto* base = dynamic_cast<ecee::ProcessorBase*> (p.get()))
+    {
+        std::cout << "presets: " << base->getNumPrograms() << ", unknown parameter names: " << base->countUnknownPresetParameters() << "\n";
+        juce::AudioBuffer<float> buf (2, kBlock);
+        juce::MidiBuffer midi;
+        for (int i = 0; i < base->getNumPrograms(); ++i)
+        {
+            base->applyPreset (i);
+            p->reset();
+            p->prepareToPlay (kFs, kBlock);
+            juce::Random rnd (3);
+            double inSq = 0, outSq = 0; float peak = 0; bool finite = true;
+            int t = 0;
+            for (int b = 0; b < 375; ++b)   // 4 s of a drum-ish loop at roughly -14 dBFS RMS
+            {
+                for (int k = 0; k < kBlock; ++k, ++t)
+                {
+                    const float envK = std::exp (-(float) (t % 12000) / 2500.0f);
+                    const float v = 0.45f * envK * (float) std::sin (2.0 * juce::MathConstants<double>::pi * 60.0 * t / kFs)
+                                  + 0.25f * (rnd.nextFloat() * 2.0f - 1.0f) * std::exp (-(float) ((t + 6000) % 12000) / 900.0f)
+                                  + 0.08f * (float) std::sin (2.0 * juce::MathConstants<double>::pi * 330.0 * t / kFs);
+                    buf.setSample (0, k, v); buf.setSample (1, k, v * 0.95f);
+                    if (b >= 125) inSq += (double) v * v;
+                }
+                p->processBlock (buf, midi);
+                if (b >= 125)
+                    for (int k = 0; k < kBlock; ++k)
+                    {
+                        const float o = buf.getSample (0, k);
+                        if (! std::isfinite (o)) finite = false;
+                        outSq += (double) o * o;
+                        peak = std::max (peak, std::abs (o));
+                    }
+            }
+            const double change = 10.0 * std::log10 (std::max (outSq, 1e-20) / std::max (inSq, 1e-20));
+            std::cout << "  " << juce::String (i + 1).paddedLeft ('0', 2) << " " << base->getProgramName (i).paddedRight (' ', 24)
+                      << " level change " << juce::String (change, 1).paddedLeft (' ', 6) << " dB   peak "
+                      << juce::String (20.0 * std::log10 (std::max (peak, 1e-9f)), 1).paddedLeft (' ', 6) << " dBFS"
+                      << (finite ? "" : "   NaN!") << (base->isPresetModified() ? "   (modified?!)" : "") << "\n";
+        }
+        base->applyPreset (std::min (2, base->getNumPrograms() - 1)); // show a named preset in the snapshot
     }
 
     // feed something drum-like so the meters have something to show, then snapshot the editor

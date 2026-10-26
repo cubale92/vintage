@@ -34,6 +34,7 @@ private:
     ecee::ui::VUMeter vuL, vuR;
     ecee::ui::BatSwitch speed, formula, autoGain;
     ecee::ui::Knob input, bias, bump, wow, hiss, mixKnob, output;
+    ecee::ui::PresetBar presetBar;
 };
 
 class Reel8Editor : public ecee::ui::ScaledEditor

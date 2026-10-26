@@ -44,6 +44,22 @@ Fet8Processor::Fet8Processor()
     pHpf     = state.getRawParameterValue ("schpf");
     pMix     = state.getRawParameterValue ("mix");
     pLink    = state.getRawParameterValue ("link");
+
+    // ratio: 0=4 1=8 2=12 3=20 4=ALL | schpf: 0=off 1=60 2=100 3=150 4=250 Hz | attack in ms (0.02-0.8), release in ms
+    setPresets ({
+        { "Init", {} },
+        { "Drum Bus Smash",       { { "input", 18 }, { "output", -13 }, { "attack", 0.40f }, { "release", 80 },  { "ratio", 4 }, { "schpf", 2 }, { "mix", 55 } } },
+        { "Parallel NY Drums",    { { "input", 22 }, { "output", -15 }, { "attack", 0.10f }, { "release", 100 }, { "ratio", 4 }, { "schpf", 1 }, { "mix", 35 } } },
+        { "Kick Punch",           { { "input", 7 },  { "output", -3 },  { "attack", 0.80f }, { "release", 150 }, { "ratio", 0 } } },
+        { "Snare Crack",          { { "input", 11 }, { "output", -5 },  { "attack", 0.80f }, { "release", 60 },  { "ratio", 1 }, { "schpf", 2 } } },
+        { "Dusty Breaks",         { { "input", 14 }, { "output", -9 },  { "attack", 0.25f }, { "release", 90 },  { "ratio", 2 }, { "schpf", 1 }, { "mix", 70 } } },
+        { "Room Mic Crush",       { { "input", 26 }, { "output", -4 }, { "attack", 0.02f }, { "release", 50 },  { "ratio", 3 } } },
+        { "808 Control",          { { "input", 6 },  { "output", -2 },  { "attack", 0.30f }, { "release", 350 }, { "ratio", 0 } } },
+        { "Vocal Leveler",        { { "input", 9 },  { "output", -4 },  { "attack", 0.45f }, { "release", 400 }, { "ratio", 0 }, { "schpf", 2 } } },
+        { "Rap Vocal Upfront",    { { "input", 15 }, { "output", -8 },  { "attack", 0.20f }, { "release", 120 }, { "ratio", 2 }, { "schpf", 3 } } },
+        { "Sample Flattener",     { { "input", 12 }, { "output", -7 },  { "attack", 0.15f }, { "release", 250 }, { "ratio", 1 }, { "schpf", 1 } } },
+        { "Peak Catcher",         { { "input", 2 },  { "output", -1 },  { "attack", 0.02f }, { "release", 200 }, { "ratio", 3 } } },
+    });
 }
 
 void Fet8Processor::prepareToPlay (double sampleRate, int samplesPerBlock)

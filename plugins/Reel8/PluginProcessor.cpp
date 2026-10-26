@@ -48,6 +48,22 @@ Reel8Processor::Reel8Processor()
     pHiss    = state.getRawParameterValue ("hiss");
     pMix     = state.getRawParameterValue ("mix");
     pAuto    = state.getRawParameterValue ("autogain");
+
+    // speed: 0=7.5 1=15 2=30 ips | formula: 0=ferric 1=classic 2=hi-out | bias -1 (under: brighter, dirtier) .. +1 (over: darker, cleaner)
+    setPresets ({
+        { "Init", {} },
+        { "Mix Bus Glue",         { { "input", 0 },  { "speed", 2 }, { "formula", 2 }, { "bump", 30 }, { "wow", 5 } } },
+        { "Warm 15 IPS",          { { "input", 3 },  { "speed", 1 }, { "formula", 1 }, { "bump", 55 }, { "wow", 12 }, { "hiss", 5 } } },
+        { "Drum Tape Smash",      { { "input", 12 }, { "speed", 1 }, { "formula", 0 }, { "bias", -0.3f }, { "bump", 60 }, { "wow", 8 } } },
+        { "Dusty Sampler",        { { "input", 9 },  { "speed", 0 }, { "formula", 0 }, { "bias", 0.5f },  { "bump", 80 }, { "wow", 30 }, { "hiss", 20 } } },
+        { "Cassette Deck",        { { "input", 6 },  { "speed", 0 }, { "formula", 0 }, { "bias", 0.4f },  { "bump", 70 }, { "wow", 45 }, { "hiss", 35 } } },
+        { "Wobbly VHS",           { { "input", 4 },  { "speed", 0 }, { "formula", 0 }, { "bias", 0.6f },  { "bump", 65 }, { "wow", 85 }, { "hiss", 40 } } },
+        { "Bass Thickener",       { { "input", 6 },  { "speed", 1 }, { "formula", 1 }, { "bump", 90 }, { "wow", 0 } } },
+        { "Keys & Rhodes Warmth", { { "input", 5 },  { "speed", 1 }, { "formula", 1 }, { "bias", 0.2f },  { "bump", 45 }, { "wow", 22 }, { "hiss", 8 } } },
+        { "Vocal Tape Sheen",     { { "input", 2 },  { "speed", 2 }, { "formula", 2 }, { "bias", -0.2f }, { "bump", 20 }, { "wow", 4 } } },
+        { "Parallel Saturation",  { { "input", 15 }, { "speed", 1 }, { "formula", 0 }, { "bump", 60 }, { "wow", 6 },  { "mix", 35 } } },
+        { "Clean Hi-Fi Print",    { { "input", -3 }, { "speed", 2 }, { "formula", 2 }, { "bias", 0.2f },  { "bump", 20 }, { "wow", 0 } } },
+    });
 }
 
 void Reel8Processor::prepareToPlay (double sampleRate, int samplesPerBlock)
