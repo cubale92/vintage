@@ -6,16 +6,24 @@ project(8ceeVintage VERSION 1.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# ON for build machines without a desktop session (GitLab's hosted Windows runners): patches JUCE's juceaide
+# helper so it doesn't start the GUI system, and skips the VST3 moduleinfo step (it loads the plug-in).
+option(ECEE_HEADLESS_CI "Build on a machine without a desktop session" OFF)
+
 # Use a local JUCE checkout with -DJUCE_PATH=/path/to/JUCE, otherwise it is downloaded.
 set(JUCE_PATH "" CACHE PATH "Path to a local JUCE checkout (optional)")
 if(JUCE_PATH)
     add_subdirectory(${JUCE_PATH} JUCE)
 else()
     include(FetchContent)
+    if(ECEE_HEADLESS_CI)
+        set(ecee_juce_patch PATCH_COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch-juceaide.cmake")
+    endif()
     FetchContent_Declare(JUCE
         GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
         GIT_TAG 8.0.4
-        GIT_SHALLOW ON)
+        GIT_SHALLOW ON
+        ${ecee_juce_patch})
     FetchContent_MakeAvailable(JUCE)
 endif()
 
@@ -26,6 +34,12 @@ endif()
 
 # Set ON to copy the built plug-ins into the system plug-in folders.
 option(ECEE_COPY_PLUGINS "Copy plug-ins to the system plug-in folders after building" OFF)
+
+if(ECEE_HEADLESS_CI)
+    set(ecee_vst3_manifest FALSE)
+else()
+    set(ecee_vst3_manifest TRUE)
+endif()
 
 function(ecee_add_plugin target product code category)
     juce_add_plugin(${target}
@@ -42,6 +56,7 @@ function(ecee_add_plugin target product code category)
         IS_MIDI_EFFECT FALSE
         EDITOR_WANTS_KEYBOARD_FOCUS FALSE
         COPY_PLUGIN_AFTER_BUILD ${ECEE_COPY_PLUGINS}
+        VST3_AUTO_MANIFEST ${ecee_vst3_manifest}
         VST3_CATEGORIES Fx ${category}
         AU_MAIN_TYPE kAudioUnitType_Effect)
 

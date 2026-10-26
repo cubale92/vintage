@@ -1,6 +1,6 @@
 # 8cee Vintage — GitLab CI
-# Windows builds run on GitLab's hosted Windows runners.
-# macOS hosted runners need GitLab Premium/Ultimate (or your own Mac runner), so that job is manual.
+# windows: builds the three VST3s + standalone apps on GitLab's hosted Windows runners (free plan).
+# macos:   manual — GitLab's hosted Mac runners need a paid plan (or your own Mac registered as a runner).
 
 stages:
   - build
@@ -12,15 +12,43 @@ windows:
   stage: build
   tags:
     - saas-windows-medium-amd64
+  timeout: 2h
   script:
+    - cmake --version
+    # static MSVC runtime: no Visual C++ Redistributable needed on the user's PC
     - $env:CMAKE_TOOLCHAIN_FILE = "$((Get-Location).Path -replace '\\','/')/cmake/msvc-static-runtime.cmake"
-    - cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
-    - cmake --build build --config Release --parallel 4
-    - New-Item -ItemType Directory -Force -Path dist\VST3, dist\Standalone | Out-Null
-    - foreach ($p in "FET8","Bus8","Reel8") { Copy-Item -Recurse "build\${p}_artefacts\Release\VST3\*.vst3" dist\VST3\ ; Copy-Item "build\${p}_artefacts\Release\Standalone\*.exe" dist\Standalone\ }
-    - curl.exe -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip
-    - Expand-Archive pv.zip -DestinationPath pv -Force
-    - Get-ChildItem dist\VST3\*.vst3 | ForEach-Object { .\pv\pluginval.exe --strictness-level 5 --validate-in-process --skip-gui-tests --timeout-ms 600000 $_.FullName; if ($LASTEXITCODE -ne 0) { exit 1 } }
+    # ECEE_HEADLESS_CI: these runners have no desktop session; see cmake/patch-juceaide.cmake
+    - |
+      cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release -DECEE_HEADLESS_CI=ON
+      if ($LASTEXITCODE -ne 0) {
+        Write-Host "=== configure failed: diagnosing juceaide ==="
+        Write-Host "interactive session: $([Environment]::UserInteractive)  user: $(whoami)"
+        Get-ChildItem -Recurse -Filter juceaide.exe build -ErrorAction SilentlyContinue | ForEach-Object {
+          Write-Host "running $($_.FullName)"
+          & $_.FullName version
+          Write-Host ("juceaide exit code: 0x{0:X8}" -f $LASTEXITCODE)
+        }
+        exit 1
+      }
+    - cmake --build build --config Release --parallel 4 -- /v:minimal
+    - |
+      New-Item -ItemType Directory -Force -Path dist\VST3, dist\Standalone | Out-Null
+      foreach ($p in "FET8","Bus8","Reel8") {
+        Copy-Item -Recurse "build\${p}_artefacts\Release\VST3\*.vst3" dist\VST3\
+        Copy-Item "build\${p}_artefacts\Release\Standalone\*.exe" dist\Standalone\
+      }
+      Get-ChildItem -Recurse dist | Select-Object FullName, Length | Format-Table -AutoSize
+    # plug-in check (informational: a plug-in host may itself need a desktop session on these runners)
+    - |
+      try {
+        curl.exe -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip
+        Expand-Archive pv.zip -DestinationPath pv -Force
+        Get-ChildItem dist\VST3\*.vst3 | ForEach-Object {
+          .\pv\pluginval.exe --strictness-level 5 --validate-in-process --skip-gui-tests --timeout-ms 600000 $_.FullName
+          Write-Host ("pluginval {0}: exit code {1}" -f $_.Name, $LASTEXITCODE)
+        }
+      } catch { Write-Host "pluginval could not run: $_" }
+      $global:LASTEXITCODE = 0
   artifacts:
     name: "8cee-Vintage-Windows"
     paths:
